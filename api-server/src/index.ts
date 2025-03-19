@@ -38,7 +38,14 @@ app.use('/protected/*', jwt({
 }))
 app.get('/protected/user', (c) => {
   const user = c.get('jwtPayload') // Auth0のペイロードデータ
-  return c.json({ message: 'Authenticated', user })
+  const content = user.sub == 'admin' ? 'Admin' : 'User'
+  return c.json({ message: 'Authenticated', content })
+})
+
+app.get('protected/me', (c) => {
+  const { sub } = c.get('jwtPayload')
+  const user = { sub }
+  return c.json({ user })
 })
 
 export default app

@@ -1,10 +1,14 @@
 {
   "name": "api-server",
+  "type": "module",
   "scripts": {
     "dev": "bun run --hot src/index.ts"
   },
   "dependencies": {
+    "@types/jsonwebtoken": "^9.0.9",
     "hono": "^4.7.4",
+    "jose": "^6.0.10",
+    "jsonwebtoken": "^9.0.2",
     "prisma": "^6.5.0",
     "zod": "^3.24.2"
   },

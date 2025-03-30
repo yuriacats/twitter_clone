@@ -2,6 +2,7 @@ import { Hono } from 'hono'
 import { jwt } from 'hono/jwt'
 import jwtLib from 'jsonwebtoken'
 import { createEnv } from "@t3-oss/env-core"
+import { PrismaClient } from '@prisma/client'
 import { z } from 'zod'
 
 const env = createEnv({
@@ -13,6 +14,7 @@ const env = createEnv({
   runtimeEnv: process.env,
 })
 
+const Prisma = new PrismaClient()
 const app = new Hono()
 
 app.get('/', (c) => {
@@ -36,10 +38,47 @@ app.post('/login', async (c) => {
 app.use('/protected/*', jwt({
   secret: env.SECRET,
 }))
-app.get('/protected/user', (c) => {
+
+const getUser = async (sub: string) => {
+  const user = await Prisma.profile.findUnique({
+    where: { username: sub }
+  })
+  return user
+}
+
+app.get('/protected/user', async (c) => {
   const user = c.get('jwtPayload') // Auth0のペイロードデータ
-  const content = user.sub == 'admin' ? 'Admin' : 'User'
-  return c.json({ message: 'Authenticated', content })
+
+  if (!user || !user.sub) {
+    return c.json({ error: 'Invalid user payload' }, 400)
+  }
+  const userData = await getUser(user.sub)
+  const content = userData == null ? 'NonUser' : userData
+  console.log('content', content)
+  return c.json({ message: 'Authenticated', content, username: user.sub })
+})
+
+const profileSchema = z.object({
+  name: z.string().min(3).max(30),
+  profile: z.string().max(500).optional(),
+  icon_url: z.string().url().optional(),
+})
+
+app.post('api/profile', async (c) => {
+  const body = await c.req.json()
+  const result = profileSchema.safeParse(body)
+  if (!result.success) {
+    return c.json({ error: result.error }, 400)
+  }
+
+  const created = await Prisma.profile.create({
+    data: {
+      username: result.data.name,
+      profile: result.data.profile,
+      iconUrl: result.data.icon_url,
+    }
+  })
+  return c.json({ created })
 })
 
 app.get('protected/me', (c) => {

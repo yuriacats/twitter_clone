@@ -47,7 +47,7 @@ const getUser = async (sub: string) => {
 }
 
 app.get('/protected/user', async (c) => {
-  const user = c.get('jwtPayload') // Auth0のペイロードデータ
+  const user = c.get('jwtPayload')
 
   if (!user || !user.sub) {
     return c.json({ error: 'Invalid user payload' }, 400)

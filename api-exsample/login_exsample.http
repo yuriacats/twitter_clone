@@ -1,4 +1,6 @@
-POST http://localhost:3000/login
+@hostname = localhost:3000
+# @name login
+POST http://{{hostname}}/login
 Content-Type: application/json
 
 {
@@ -7,7 +9,7 @@ Content-Type: application/json
 
 ###
 
-POST http://localhost:3000/api/profile
+POST http://{{hostname}}/api/profile
 Content-Type: application/json
 
 {
@@ -15,5 +17,10 @@ Content-Type: application/json
   "profile": "my name is tester",
   "icon_url" : "https://avatars.githubusercontent.com/u/29541426?v=4"
 }
+
+###
+
+GET http://{{hostname}}/protected/user
+Authorization: Bearer {{login.response.body.$.token}}
 
 ###

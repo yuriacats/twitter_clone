@@ -1,0 +1,19 @@
+POST http://localhost:3000/login
+Content-Type: application/json
+
+{
+  "username": "tester"
+}
+
+###
+
+POST http://localhost:3000/api/profile
+Content-Type: application/json
+
+{
+  "name" : "tester",
+  "profile": "my name is tester",
+  "icon_url" : "https://avatars.githubusercontent.com/u/29541426?v=4"
+}
+
+###

@@ -4,6 +4,7 @@ import jwtLib from 'jsonwebtoken'
 import { createEnv } from "@t3-oss/env-core"
 import { PrismaClient } from '@prisma/client'
 import { z } from 'zod'
+import { logger } from 'hono/logger'
 
 const env = createEnv({
   server: {
@@ -16,6 +17,7 @@ const env = createEnv({
 
 const Prisma = new PrismaClient()
 const app = new Hono()
+app.use(logger())
 
 app.get('/', (c) => {
   return c.json({ response: 'Hello Hono!' })

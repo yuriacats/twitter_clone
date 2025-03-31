@@ -48,6 +48,14 @@ const getUser = async (sub: string) => {
   return user
 }
 
+const profileSchema = z.object({
+  name: z.string().min(3).max(30),
+  profile: z.string().max(500).optional(),
+  icon_url: z.string().url().optional(),
+})
+
+
+// ここからがエンドポイントの実装
 app.get('/protected/user', async (c) => {
   const user = c.get('jwtPayload')
 
@@ -58,12 +66,6 @@ app.get('/protected/user', async (c) => {
   const content = userData == null ? 'NonUser' : userData
   console.log('content', content)
   return c.json({ message: 'Authenticated', content, username: user.sub })
-})
-
-const profileSchema = z.object({
-  name: z.string().min(3).max(30),
-  profile: z.string().max(500).optional(),
-  icon_url: z.string().url().optional(),
 })
 
 app.post('api/profile', async (c) => {
